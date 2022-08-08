@@ -7,7 +7,7 @@ mkdir -p ${OUT_DIR}
 echo "Flattening contracts..."
 
 FILES=(
-    "contracts/Counter.sol"
+    "contracts/Pool.sol"
 )
 
 for path in ${FILES[@]}; do
