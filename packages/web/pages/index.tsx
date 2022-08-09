@@ -87,12 +87,14 @@ const Home: NextPage = () => {
   const handleChange = useCallback(async () => {
     if (!pool || !accounts?.length) return
     try {
-      const currentBalance = accounts?.length ? await provider?.getBalance(accounts[0]) : undefined
-      const totalDeposits = await pool.totalDeposits()
-      const totalReleased = await pool.totalReleased()
-      const myDeposit = await pool['deposits(address)'](accounts[0])
-      const myRewards = await pool['rewards(address)'](accounts[0])
-      const releasable = await pool['releasable(address)'](accounts[0])
+      const [currentBalance, totalDeposits, totalReleased, myDeposit, myRewards, releasable] = await Promise.all([
+        accounts?.length ? provider?.getBalance(accounts[0]) : Promise.resolve(undefined),
+        pool.totalDeposits(),
+        pool.totalReleased(),
+        pool['deposits(address)'](accounts[0]),
+        pool['rewards(address)'](accounts[0]),
+        pool['releasable(address)'](accounts[0])
+      ])
       setState({
         totalDeposits,
         totalReleased,
