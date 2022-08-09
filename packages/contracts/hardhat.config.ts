@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv'
 dotenv.config()
 
+import { Pool__factory, Pool } from './build/types'
 import { HardhatUserConfig } from 'hardhat/types'
 import { task } from 'hardhat/config'
 
@@ -103,7 +104,7 @@ const config: HardhatUserConfig = {
     },
     ganache: {
       chainId: 1337,
-      url: 'http://localhost:8545',
+      url: 'http://127.0.0.1:8545',
     },
   },
   etherscan: {
@@ -138,3 +139,29 @@ const config: HardhatUserConfig = {
 setupDefaultNetworkProviders(config)
 
 export default config
+
+task('fund', 'Fund an account')
+  .addParam('account', "The account's address")
+  .addParam('amount', 'The amount to send in ether')
+  .setAction(async (taskArgs, hre) => {
+    const signer = (await hre.ethers.getSigners())[0]
+
+    await signer.sendTransaction({
+      to: taskArgs.account,
+      value: hre.ethers.utils.parseEther(String(taskArgs.amount)),
+    })
+
+    console.log('new balance', await hre.ethers.provider.getBalance(taskArgs.account))
+  })
+
+task('reward', 'Reward the pool')
+  .addParam('pool', "The pool's address")
+  .addParam('amount', 'The amount to reward in ether')
+  .setAction(async (taskArgs, hre) => {
+    const signer = (await hre.ethers.getSigners())[0]
+
+    const poolFactory = new Pool__factory()
+    const pool = poolFactory.attach(taskArgs.pool)
+
+    await pool.connect(signer).reward({ value: hre.ethers.utils.parseEther(String(taskArgs.amount)) })
+  })

@@ -5,8 +5,8 @@ TYPECHAIN_DIR=dist/types
 set -eo pipefail
 
 # Build contracts
-yarn clean
-yarn build
+npm run clean
+npm run build
 
 # Refresh distribution folder
 rm -rf dist && mkdir -p dist/types/_src

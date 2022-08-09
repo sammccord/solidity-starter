@@ -57,7 +57,7 @@ contract Pool is Ownable {
     function released(address account) public view returns (uint256) {
         return _released[account];
     }
-    
+
     /**
      * @dev The main deposit function making users elligible to receive awards
      */
@@ -77,13 +77,23 @@ contract Pool is Ownable {
     }
 
     /**
+     * @dev Getter for the amount of deposits made by message sender
+     */
+    function deposits() public view returns (uint256) {
+        return _deposits[_msgSender()];
+    }
+
+    /**
      * @dev The function that wher called, rewards users in the pool. Callable only by owner
      */
-    function reward() external payable virtual onlyOwner  {
+    function reward() external payable virtual onlyOwner {
+        require(_totalDeposits > 0, "no deposits in pool to reward");
         uint256 amount = msg.value;
 
         for (uint256 i = 0; i < _payees.length; i++) {
-            _rewards[_payees[i]] += amount.div(100 / _deposits[_payees[i]].mul(100).div(_totalDeposits));
+            if (_deposits[_payees[i]] > 0) {
+                _rewards[_payees[i]] += amount.div(100 / _deposits[_payees[i]].mul(100).div(_totalDeposits));
+            }
         }
         emit RewardsDistributed();
     }
@@ -96,11 +106,16 @@ contract Pool is Ownable {
     }
 
     /**
+     * @dev Getter for the amount of rewards owed to message sender
+     */
+    function rewards() public view returns (uint256) {
+        return _rewards[_msgSender()];
+    }
+
+    /**
      * @dev internal logic for computing the pending payment of an `account` given their deposit and rewards
      */
-    function _pendingPayment(
-        address account
-    ) private view returns (uint256) {
+    function _pendingPayment(address account) private view returns (uint256) {
         return _deposits[account].add(_rewards[account]);
     }
 
@@ -173,7 +188,7 @@ contract Pool is Ownable {
         uint256 payment = _deposit.add(_reward);
         require(amount <= payment, "account cannot release more than what is owed");
 
-        if(amount > _reward) {
+        if (amount > _reward) {
             uint256 remainingDeposit = payment.sub(amount);
             _released[msg.sender] += amount;
             _deposits[msg.sender] = remainingDeposit;
@@ -181,7 +196,7 @@ contract Pool is Ownable {
             _totalDeposits -= _deposit.sub(remainingDeposit);
         }
 
-        if(amount <= _reward) {
+        if (amount <= _reward) {
             _released[msg.sender] += amount;
             _rewards[msg.sender] = _reward.sub(amount);
         }

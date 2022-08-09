@@ -1,57 +1,56 @@
-# Ethereum Solidity Starter
+# ETH Pool Solidity + Frontend Challenge
 
-This is a skeleton repository to work as a foundation for a smart contracts project using Solidity.
+[Assignment doc](https://github.com/ekonomia-tech/hiring-challenges/blob/main/solidity-and-front-end.md)
 
-## Quickstart
+## Time Spent
 
-1. Clone the repo
-2. Run `yarn install`
+Longer than I'd like to admit, 6-8 hours
+## Getting Started
 
-## What’s Included?
+- Clone the repo.
+- `npm install -g pnpm`
+  - This fork is now a monorepo btw
+- `pnpm install`
 
-- **[Hardhat](https://hardhat.org/)**: Ethereum development environment for professionals.
-- **[Waffle](https://getwaffle.io/)**: The most advanced framework for testing smart contracts
-- **[Typechain](https://github.com/ethereum-ts/TypeChain)**: TypeScript bindings for Ethereum smart contracts
-- **[Tenderly](https://tenderly.co/)**: Real-time monitoring, alerting, and troubleshooting for Smart Contracts.
-- **[Ethers]()**: A complete Ethereum wallet implementation and utilities in JavaScript (and TypeScript).
-- **[Etherscan](https://etherscan.io)**: Verify contracts in The Ethereum Blockchain Explorer
+## Running Hardhat Tests
 
-#### Hardhat Plugins
-- ABI Exporter
-- Gas Reporter
-- Contract Sizer
-- OpenZeppelin Upgrades
-## Usage
+- `pnpm run test --filter contracts`
 
-Look at the `package.json` inside scripts section to see available commands. A number of helper build scripts are located in `/scripts`.
-### Build contracts
+## Running Next.js Dapp
 
-Compiles contracts and creates Typechain bindings.
+- `cd packages/contracts && npm run dev`
+  - Will start a hardhat node, and deploy contracts
+  - Note the contract's address logged from this command
+- Place the pool contract's address in `packages/web/.env` ensuring that the `NEXT_PUBLIC_POOL_ADDRESS` variable is correct
+- In another terminal, `cd packages/web && npm run dev`
 
-`yarn build`
+**Note:** The app is configured to only use Metamask at the moment, so please ensure you have the browser extension installed - [https://metamask.io/](https://metamask.io/)
 
-### Run tests
+- Fund your testnet account so you can start depositing to the pool
 
-Runs all tests in the `/test` folder.
+```sh
+cd packages/contracts
+npx hardhat fund --account $YOUR_ADDRESS_HERE --amount 1.0 --network localhost
+```
 
-`yarn test`
+- Open `localhost:3000`
+- Click `Connect` in the top right to grant the dapp access to the Web3 context provided by Metamask
+- Click `Deposit` to make a deposit to the pool contract
+- Distribute rewards to the pool
 
-### Run tests with gas report
+```sh
+cd packages/contracts
+npx hardhat reward --pool $POOL_CONTRACT_ADDRESS --amount 1.0 --network localhost
+```
 
-Run all tests calculating gas estimations.
+- Click `Withdraw` to withdraw your deposit + share of rewards
 
-`yarn test:gas`
+## Misc.
 
-The gas report will be saved on the `/reports` folder.
+This was fun; I forgot how cool it feels to develop dapps. The tooling has come a long way, last I wrote Solidity there was no Hardhat and I mainly worked with Ganache + a bunch of Truffle scripts. This experience is much better.
 
-### Deploy to Ethereum
+It did take me a while to figure out all the new tooling, though, so that did eat a good chunk of my time I could've used to build out sexier features.
 
-Create/modify network config in hardhat.config.ts and add API key and private key, then run:
+Initially, I modeled my contracts after OpenZeppelin's `PaymentSplitter` contract, and had functionality to deposit / reward in the pool's ERC20, but I was taking too long and just decided to keep it to ether. I also have functionality to do partial withdraws, but that part didn't make it into the frontend before I cut myself off. I also would've liked to use the more sophisticated event filter API, and render a table of pool events, but settled for basic event handling and amount display. There's obviously so much that could be done, but I need to call it.
 
-`npx hardhat run --network rinkeby scripts/deploy.ts`
-
-### Verify on Etherscan
-
-Using the hardhat-etherscan plugin, add Etherscan API key to hardhat.config.ts, then run:
-
-`npx hardhat verify --network rinkeby <DEPLOYED ADDRESS>`
+Anyway, thanks for the opportunity. My Solidity experience is primarily self taught, so if I wouldn't pass an audit, definitely let me know why. Thanks again!

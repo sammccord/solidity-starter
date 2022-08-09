@@ -113,10 +113,10 @@ describe('Pool', () => {
     const released = await pool.released(userA.address)
     expect(released).to.eq(toWithdraw)
 
-    const remainingDeposits = await pool.deposits(userA.address)
+    const remainingDeposits = await pool['deposits(address)'](userA.address)
     expect(remainingDeposits).to.eq(amount.div(2))
 
-    const remainingRewards = await pool.rewards(userA.address)
+    const remainingRewards = await pool['rewards(address)'](userA.address)
     expect(remainingRewards).to.eq(0)
   })
 
@@ -147,7 +147,7 @@ describe('Pool', () => {
     const releasable = await pool['releasable(address)'](userA.address)
     expect(releasable).to.eq(amount.mul(2))
 
-    const rewards = await pool.rewards(userA.address)
+    const rewards = await pool['rewards(address)'](userA.address)
     expect(rewards).to.eq(amount)
   })
 
@@ -191,13 +191,13 @@ describe('Pool', () => {
     const aReleasable = await pool['releasable(address)'](userA.address)
     expect(aReleasable).to.eq(amount.mul(2))
 
-    const aRewards = await pool.rewards(userA.address)
+    const aRewards = await pool['rewards(address)'](userA.address)
     expect(aRewards).to.eq(amount)
 
     const bReleasable = await pool['releasable(address)'](userB.address)
     expect(bReleasable).to.eq(amount)
 
-    const bRewards = await pool.rewards(userB.address)
+    const bRewards = await pool['rewards(address)'](userB.address)
     expect(bRewards).to.eq(BigNumber.from(0))
   })
 })

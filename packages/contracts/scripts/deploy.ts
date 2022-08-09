@@ -8,7 +8,7 @@ async function main() {
   const contract = await factory.deploy()
 
   // The address the Contract WILL have once mined
-  console.log(contract.address)
+  console.log(`Pool contract address: ${contract.address}`)
 
   // The transaction that was sent to the network to deploy the Contract
   console.log(contract.deployTransaction.hash)
